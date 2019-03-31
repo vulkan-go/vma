@@ -227,9 +227,9 @@ func (a *Allocator) BuildStatsString(detailedMap bool) string {
 	if detailedMap {
 		detailed = C.VK_TRUE
 	}
-	C.vmaBuildStatsString(C.VmaAllocator(a.cAlloc), &charPtr, detailed)
+	C.vmaBuildStatsString(a.cAlloc, &charPtr, detailed)
 	buildStats := C.GoString(charPtr)
-	C.vmaFreeStatsString(C.VmaAllocator(a.cAlloc), charPtr)
+	C.vmaFreeStatsString(a.cAlloc, charPtr)
 	return buildStats
 }
 
@@ -482,7 +482,7 @@ func (a *Allocator) CreateBuffer(bufferCreateInfo *vk.BufferCreateInfo, allocati
 }
 
 func (a *Allocator) DestroyBuffer(buffer vk.Buffer, allocation Allocation) {
-	C.vmaDestroyBuffer(C.VmaAllocator(a.cAlloc), C.VkBuffer(unsafe.Pointer(buffer)),
+	C.vmaDestroyBuffer(a.cAlloc, C.VkBuffer(unsafe.Pointer(buffer)),
 		C.VmaAllocation(allocation))
 }
 
@@ -506,6 +506,6 @@ func (a *Allocator) CreateImage(imageCreateInfo *vk.ImageCreateInfo, allocationC
 }
 
 func (a *Allocator) DestroyImage(image vk.Image, allocation Allocation) {
-	C.vmaDestroyImage(C.VmaAllocator(a.cAlloc), C.VkImage(unsafe.Pointer(image)),
+	C.vmaDestroyImage(a.cAlloc, C.VkImage(unsafe.Pointer(image)),
 		C.VmaAllocation(allocation))
 }

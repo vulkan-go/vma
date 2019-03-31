@@ -36,7 +36,7 @@ func NewAllocationCreateInfo(flags uint32, usage uint32,
 	})
 }
 
-// AllocationInfo parameters of VmaAllocation objects, that can be retrieved using function vmaGetAllocationInfo()
+// AllocationInfo parameters of VmaAllocation objects, that can be retrieved using function GetAllocationInfo()
 type AllocationInfo C.VmaAllocationInfo
 
 func (a *AllocationInfo) MemoryType() uint32 {
@@ -127,6 +127,36 @@ type DefragmentationContext C.VmaDefragmentationContext
 // this struct is not included in these bindings.
 type DefragmentationInfo2 C.VmaDefragmentationInfo2
 
+// NewDefragmentationInfo2 creates a new DefragmentationInfo2. allocsChanged should either be nil or a slice of equal
+// length to allocations.
+func NewDefragmentationInfo2(flags uint32, allocations []Allocation, allocsChanged []vk.Bool32, pools []Pool,
+	maxCPUBytesToMove vk.DeviceSize, maxCPUAllocationsToMove uint32,
+	maxGPUBytesToMove vk.DeviceSize, maxGPUAllocationsToMove uint32,
+	commandBuffer vk.CommandBuffer) DefragmentationInfo2 {
+
+	if len(allocsChanged) != 0 && len(allocsChanged) != len(allocations) {
+		panic("NewDefragmentationInfo2: allocsChanged not empty and not same length as allocations")
+	}
+
+	var d C.VmaDefragmentationInfo2
+	d.flags = C.uint32_t(flags)
+	d.allocationCount = C.uint32_t(len(allocations))
+	d.pAllocations = (*C.VmaAllocation)(&allocations[0])
+	if len(allocsChanged) != 0 {
+		d.pAllocationsChanged = (*C.VkBool32)(&allocsChanged[0])
+	}
+	if pools != nil {
+		d.poolCount = C.uint32_t(len(pools))
+		d.pPools = (*C.VmaPool)(&pools[0])
+	}
+	d.maxCpuBytesToMove = C.VkDeviceSize(maxCPUBytesToMove)
+	d.maxCpuAllocationsToMove = C.uint32_t(maxCPUAllocationsToMove)
+	d.maxGpuBytesToMove = C.VkDeviceSize(maxGPUBytesToMove)
+	d.maxGpuAllocationsToMove = C.uint32_t(maxGPUAllocationsToMove)
+	d.commandBuffer = C.VkCommandBuffer(unsafe.Pointer(commandBuffer))
+	return DefragmentationInfo2(d)
+}
+
 // DefragmentationStats is the statistics returned by function vmaDefragment()
 type DefragmentationStats C.VmaDefragmentationStats
 
@@ -138,6 +168,20 @@ type Pool C.VmaPool
 
 // PoolCreateInfo describes parameter of created VmaPool
 type PoolCreateInfo C.VmaPoolCreateInfo
+
+// NewPoolCreateInfo creates a new PoolCreateInfo.
+func NewPoolCreateInfo(memoryTypeIndex, flags uint32, blockSize vk.DeviceSize,
+	minBlockCount, maxBlockCount uintptr, frameInUseCount uint32) PoolCreateInfo {
+
+	var p C.VmaPoolCreateInfo
+	p.memoryTypeIndex = C.uint32_t(memoryTypeIndex)
+	p.flags = C.VmaPoolCreateFlags(flags)
+	p.blockSize = C.VkDeviceSize(blockSize)
+	p.minBlockCount = C.size_t(minBlockCount)
+	p.maxBlockCount = C.size_t(maxBlockCount)
+	p.frameInUseCount = C.uint32_t(frameInUseCount)
+	return PoolCreateInfo(p)
+}
 
 // PoolStats describes parameter of existing VmaPool
 type PoolStats C.VmaPoolStats

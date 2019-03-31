@@ -198,8 +198,10 @@ type Stats C.VmaStats
 // Pointers to some Vulkan functions - a subset used by the library
 type vulkanFunctions C.VmaVulkanFunctions
 
+// TODO: Have this return vulkan-go/vulkan wrapper structs
 func (a *Allocator) GetPhysicalDeviceProperties() []vk.PhysicalDeviceProperties
 
+// TODO: Have this return vulkan-go/vulkan wrapper structs
 func (a *Allocator) GetMemoryProperties() []vk.PhysicalDeviceMemoryProperties
 
 func (a *Allocator) GetMemoryTypeProperties(memoryTypeIndex uint32) vk.MemoryPropertyFlags {

@@ -1,3 +1,6 @@
+#ifndef _VMA_GO_H
+#define _VMA_GO_H
+
 #define VK_NO_PROTOTYPES
 #include "vulkan/vulkan.h"
 
@@ -27,3 +30,5 @@ void initVulkanFunctions(void* getProcAddrPtr, VkInstance instance, VmaVulkanFun
 	funcs->vkDestroyImage = (PFN_vkDestroyImage)((*getProcAddr)(instance, "vkDestroyImage"));
 	funcs->vkCmdCopyBuffer = (PFN_vkCmdCopyBuffer)((*getProcAddr)(instance, "vkCmdCopyBuffer"));
 }
+
+#endif // include guard

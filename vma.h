@@ -29,6 +29,8 @@ void initVulkanFunctions(void* getProcAddrPtr, VkInstance instance, VmaVulkanFun
 	funcs->vkCreateImage = (PFN_vkCreateImage)((*getProcAddr)(instance, "vkCreateImage"));
 	funcs->vkDestroyImage = (PFN_vkDestroyImage)((*getProcAddr)(instance, "vkDestroyImage"));
 	funcs->vkCmdCopyBuffer = (PFN_vkCmdCopyBuffer)((*getProcAddr)(instance, "vkCmdCopyBuffer"));
+	funcs->vkGetBufferMemoryRequirements2KHR = (PFN_vkGetBufferMemoryRequirements2)((*getProcAddr)(instance, "vkGetBufferMemoryRequirements2KHR"));
+	funcs->vkGetImageMemoryRequirements2KHR = (PFN_vkGetImageMemoryRequirements2KHR)((*getProcAddr)(instance, "vkGetImageMemoryRequirements2KHR"));
 }
 
 #endif // include guard

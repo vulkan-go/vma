@@ -4,14 +4,23 @@ package vma
 /*
 #cgo CFLAGS: -I.
 #include "vma.h"
+
+VmaVulkanFunctions vkFuncs;
 */
 import "C"
 
 import (
+	"sync/atomic"
+	"sync"
 	"errors"
 	"unsafe"
 
 	vk "github.com/vulkan-go/vulkan"
+)
+
+var (
+	fetchedVkFuncs int32 // Atomic flag which is set once Vulkan functions are fetched
+	fetchVkFuncsMu sync.Mutex
 )
 
 type result C.VkResult
@@ -66,7 +75,6 @@ func (a *AllocationInfo) UserData() unsafe.Pointer {
 // Allocator represents main object of this library initialized
 type Allocator struct {
 	cAlloc      C.VmaAllocator // The underlying VmaAllocator struct
-	vkFunctions C.VmaVulkanFunctions
 }
 
 // NewAllocator creates a new memory allocator. TODO: is it safe to copy?
@@ -90,7 +98,6 @@ func NewAllocator(
 
 	allocator := new(Allocator)
 	var create C.VmaAllocatorCreateInfo
-
 	create.flags = C.uint32_t(flags)
 	create.physicalDevice = C.VkPhysicalDevice(unsafe.Pointer(physicalDevice))
 	create.device = C.VkDevice(unsafe.Pointer(device))
@@ -105,14 +112,29 @@ func NewAllocator(
 		create.pHeapSizeLimit = (*C.VkDeviceSize)(&heapSizeLimit[0])
 	}
 
-	C.initVulkanFunctions(vulkanProcAddr,
-		C.VkInstance(unsafe.Pointer(instance)), &allocator.vkFunctions)
+	initVkFuncs(vulkanProcAddr, instance)
+	create.pVulkanFunctions = &C.vkFuncs
 
 	ret := vk.Result(C.vmaCreateAllocator(&create, &allocator.cAlloc))
 	if ret != vk.Success {
 		return nil, vk.Error(ret)
 	}
+	// allocator.cAlloc = a
 	return allocator, nil
+}
+
+func initVkFuncs(procAddr unsafe.Pointer, instance vk.Instance) {
+	if atomic.LoadInt32(&fetchedVkFuncs) == 1 {
+		return
+	}
+	fetchVkFuncsMu.Lock()
+	if atomic.LoadInt32(&fetchedVkFuncs) == 1 {
+		return
+	}
+	defer fetchVkFuncsMu.Unlock()
+	C.initVulkanFunctions(procAddr,
+		C.VkInstance(unsafe.Pointer(instance)), &C.vkFuncs)
+	atomic.StoreInt32(&fetchedVkFuncs, 1)
 }
 
 // Destroy destroys allocator object.

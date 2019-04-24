@@ -269,8 +269,9 @@ func (a *Allocator) FindMemoryTypeIndex(memoryTypeBits uint32, allocationCreateI
 
 func (a *Allocator) FindMemoryTypeIndexForBufferInfo(bufferCreateInfo *vk.BufferCreateInfo, allocationCreateInfo *AllocationCreateInfo) (uint32, error) {
 	var memTypeIndex C.uint32_t
+	cpBufferCreate, _ := bufferCreateInfo.PassRef()
 	ret := vk.Result(C.vmaFindMemoryTypeIndexForBufferInfo(a.cAlloc,
-		(*C.VkBufferCreateInfo)(unsafe.Pointer(bufferCreateInfo.Ref())),
+		(*C.VkBufferCreateInfo)(unsafe.Pointer(cpBufferCreate)),
 		(*C.VmaAllocationCreateInfo)(allocationCreateInfo), &memTypeIndex))
 	if ret != vk.Success {
 		return 0, vk.Error(ret)
@@ -280,8 +281,9 @@ func (a *Allocator) FindMemoryTypeIndexForBufferInfo(bufferCreateInfo *vk.Buffer
 
 func (a *Allocator) FindMemoryTypeIndexForImageInfo(imageCreateInfo *vk.ImageCreateInfo, allocationCreateInfo *AllocationCreateInfo) (uint32, error) {
 	var memTypeIndex C.uint32_t
+	cpImageCreate, _ := imageCreateInfo.PassRef()
 	ret := vk.Result(C.vmaFindMemoryTypeIndexForImageInfo(a.cAlloc,
-		(*C.VkImageCreateInfo)(unsafe.Pointer(imageCreateInfo.Ref())),
+		(*C.VkImageCreateInfo)(unsafe.Pointer(cpImageCreate)),
 		(*C.VmaAllocationCreateInfo)(allocationCreateInfo), &memTypeIndex))
 	if ret != vk.Success {
 		return 0, vk.Error(ret)
@@ -345,7 +347,8 @@ func (a *Allocator) AllocateMemoryPages(memoryRequirements *vk.MemoryRequirement
 		allocInfos = make([]AllocationInfo, allocationCount)
 		allocInfosPtr = &allocInfos[0]
 	}
-	ret := vk.Result(C.vmaAllocateMemoryPages(a.cAlloc, (*C.VkMemoryRequirements)(unsafe.Pointer(memoryRequirements.Ref())),
+	cpMemoryRequirements, _ := memoryRequirements.PassRef()
+	ret := vk.Result(C.vmaAllocateMemoryPages(a.cAlloc, (*C.VkMemoryRequirements)(unsafe.Pointer(cpMemoryRequirements)),
 		(*C.VmaAllocationCreateInfo)(createInfo), C.size_t(allocationCount),
 		(*C.VmaAllocation)(&allocs[0]), (*C.VmaAllocationInfo)(allocInfosPtr)))
 	if ret != vk.Success {
@@ -467,9 +470,6 @@ func (a *Allocator) DefragmentationEnd(context DefragmentationContext) error {
 	return nil
 }
 
-// func (a *Allocator) Defragment(VmaAllocation *pAllocations, size_t allocationCount, VkBool32 *pAllocationsChanged, const VmaDefragmentationInfo *pDefragmentationInfo, VmaDefragmentationStats *pDefragmentationStats)
-// Deprecated. Compacts memory by moving allocations. More...
-
 func (a *Allocator) BindBufferMemory(allocation Allocation, buffer vk.Buffer) error {
 	ret := vk.Result(C.vmaBindBufferMemory(a.cAlloc, C.VmaAllocation(allocation), C.VkBuffer(unsafe.Pointer(buffer))))
 	if ret != vk.Success {
@@ -494,8 +494,9 @@ func (a *Allocator) CreateBuffer(bufferCreateInfo *vk.BufferCreateInfo, allocati
 	if returnInfo {
 		allocInfoPtr = &allocationInfo
 	}
+	cpBufferCreate, _ := bufferCreateInfo.PassRef()
 	ret := vk.Result(C.vmaCreateBuffer(a.cAlloc,
-		(*C.VkBufferCreateInfo)(unsafe.Pointer(bufferCreateInfo.Ref())),
+		(*C.VkBufferCreateInfo)(unsafe.Pointer(cpBufferCreate)),
 		(*C.VmaAllocationCreateInfo)(allocationCreateInfo),
 		(*C.VkBuffer)(unsafe.Pointer(&buffer)), (*C.VmaAllocation)(&alloc),
 		(*C.VmaAllocationInfo)(allocInfoPtr)))
@@ -518,8 +519,9 @@ func (a *Allocator) CreateImage(imageCreateInfo *vk.ImageCreateInfo, allocationC
 	if returnInfo {
 		allocInfoPtr = &allocationInfo
 	}
+	cpImageCreate, _ := imageCreateInfo.PassRef()
 	ret := vk.Result(C.vmaCreateImage(a.cAlloc,
-		(*C.VkImageCreateInfo)(unsafe.Pointer(imageCreateInfo.Ref())),
+		(*C.VkImageCreateInfo)(unsafe.Pointer(cpImageCreate)),
 		(*C.VmaAllocationCreateInfo)(allocationCreateInfo),
 		(*C.VkImage)(unsafe.Pointer(&image)), (*C.VmaAllocation)(&alloc),
 		(*C.VmaAllocationInfo)(allocInfoPtr)))

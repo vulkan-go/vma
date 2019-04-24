@@ -43,7 +43,7 @@ type ReadWriter struct {
 var _ io.ReadWriter = (*ReadWriter)(nil)
 var _ io.Closer = (*ReadWriter)(nil)
 
-// NewReadWriter returns a new Writer for the allocation. User must keep track of the allocation's size.
+// NewReadWriter returns a new ReadWriter for the allocation. User must keep track of the allocation's size.
 func (a *Allocator) NewReadWriter(allocation Allocation, size uint64) (ReadWriter, error) {
 	buf, err := a.MapMemory(allocation)
 	if err != nil {
@@ -59,8 +59,10 @@ func (a *Allocator) NewReadWriter(allocation Allocation, size uint64) (ReadWrite
 	}, nil
 }
 
-// NewReadWriterSimple is identical to NewWriter, but asks the allocator for the size. Using this
-// function is less efficient than using NewWriter.
+// NewReadWriterSimple is identical to ReadWriter, but asks the allocator for the size. Using this
+// function is less efficient than using NewReadWriter. Note that this will use the size of the
+// internal allocation rather than what was asked when creating the buffer/image, so it will most
+// likely be larger than expected.
 func (a *Allocator) NewReadWriterSimple(allocation Allocation) (ReadWriter, error) {
 	info := a.GetAllocationInfo(allocation)
 	return a.NewReadWriter(allocation, uint64(info.Size()))
@@ -86,6 +88,7 @@ func (rw *ReadWriter) Write(p []byte) (n int, err error) {
 	dst := (*[memCap]byte)(unsafe.Pointer(rw.buffer+uintptr(rw.offset)))[:n:n]
 
 	copy(dst, p)
+	rw.offset += uint64(n)
 
 	return
 }
@@ -118,6 +121,7 @@ func (rw *ReadWriter) WriteAny(v interface{}) (n int, err error) {
 	dst := (*[memCap]byte)(unsafe.Pointer(rw.buffer+uintptr(rw.offset)))[:n:n]
 
 	copy(dst, src)
+	rw.offset += uint64(n)
 
 	return
 }
@@ -136,6 +140,7 @@ func (rw *ReadWriter) WriteFromPointer(srcPtr unsafe.Pointer, size uint64) (n in
 	dst := (*[memCap]byte)(unsafe.Pointer(rw.buffer+uintptr(rw.offset)))[:n:n]
 
 	copy(dst, src)
+	rw.offset += uint64(n)
 
 	return
 }
@@ -158,6 +163,8 @@ func (rw *ReadWriter) Reset() {
 	rw.offset = 0
 }
 
+// Read can be used to read regular byte slices. It will return io.EOF once the buffer has been
+// fully read.
 func (rw *ReadWriter) Read(p []byte) (n int, err error) {
 	if rw.buffer == 0 {
 		return 0, ErrorAlreadyUnmapped
@@ -174,6 +181,7 @@ func (rw *ReadWriter) Read(p []byte) (n int, err error) {
 	src := (*[memCap]byte)(unsafe.Pointer(rw.buffer+uintptr(rw.offset)))[:n:n]
 
 	copy(p, src)
+	rw.offset += uint64(n)
 
 	return
 }
@@ -206,6 +214,7 @@ func (rw *ReadWriter) ReadAny(v interface{}) (n int, err error) {
 	dst := (*[memCap]byte)(unsafe.Pointer(val.Pointer()))[:n:n]
 
 	copy(dst, src)
+	rw.offset += uint64(n)
 
 	return
 }
@@ -224,6 +233,7 @@ func (rw *ReadWriter) ReadToPointer(dstPtr unsafe.Pointer, size uint64) (n int, 
 	dst := (*[memCap]byte)(dstPtr)[:n:n]
 
 	copy(dst, src)
+	rw.offset += uint64(n)
 
 	return
 }

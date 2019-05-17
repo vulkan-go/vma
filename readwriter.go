@@ -237,3 +237,16 @@ func (rw *ReadWriter) ReadToPointer(dstPtr unsafe.Pointer, size uint64) (n int, 
 
 	return
 }
+
+// Buffer returns the underlying buffer as a byte slice. This method should not be used along
+// side Read or Write, as any changes to the returned slice will not be reflected in the
+// ReadWriter's offset.
+func (rw *ReadWriter) Buffer() []byte {
+	return (*[memCap]byte)(unsafe.Pointer(rw.buffer))[:rw.size:rw.size]
+}
+
+// Pointer returns the pointer to the underlying buffer. This sidesteps all safety features of
+// ReadWriter.
+func (rw *ReadWriter) Pointer() unsafe.Pointer {
+	return unsafe.Pointer(rw.buffer)
+}

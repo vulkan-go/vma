@@ -11,9 +11,13 @@ import "C"
 const (
 	// VmaAllocatorCreateFlagBits
 
-	AllocatorCreateExternallySynchronized = C.VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT
-	AllocatorCreateDedicatedAllocation    = C.VMA_ALLOCATOR_CREATE_KHR_DEDICATED_ALLOCATION_BIT
-	AllocatorCreateFlagBitsMaxEnum        = C.VMA_ALLOCATOR_CREATE_FLAG_BITS_MAX_ENUM
+	AllocatorCreateExternallySynchronized  = C.VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT
+	AllocatorCreateDedicatedAllocation     = C.VMA_ALLOCATOR_CREATE_KHR_DEDICATED_ALLOCATION_BIT
+	AllocatorCreateBindMemory2             = C.VMA_ALLOCATOR_CREATE_KHR_BIND_MEMORY2_BIT
+	AllocatorCreateMemoryBudget            = C.VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT
+	AllocatorCreateAMDDeviceCoherentMemory = C.VMA_ALLOCATOR_CREATE_AMD_DEVICE_COHERENT_MEMORY_BIT
+	AllocatorCreateBufferDeviceAddress     = C.VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT
+	AllocatorCreateFlagBitsMaxEnum         = C.VMA_ALLOCATOR_CREATE_FLAG_BITS_MAX_ENUM
 
 	// VmaRecordFlagBits
 
@@ -22,12 +26,14 @@ const (
 
 	// VmaMemoryUsage
 
-	MemoryUsageUnknown      = C.VMA_MEMORY_USAGE_UNKNOWN
-	MemoryUsageGPUOnly      = C.VMA_MEMORY_USAGE_GPU_ONLY
-	MemoryUsageCPUOnly      = C.VMA_MEMORY_USAGE_CPU_ONLY
-	MemoryUsageCPUToGPU     = C.VMA_MEMORY_USAGE_CPU_TO_GPU
-	MemoryUsageGPUToCPU     = C.VMA_MEMORY_USAGE_GPU_TO_CPU
-	MemoryUsageUsageMaxEnum = C.VMA_MEMORY_USAGE_MAX_ENUM
+	MemoryUsageUnknown            = C.VMA_MEMORY_USAGE_UNKNOWN
+	MemoryUsageGPUOnly            = C.VMA_MEMORY_USAGE_GPU_ONLY
+	MemoryUsageCPUOnly            = C.VMA_MEMORY_USAGE_CPU_ONLY
+	MemoryUsageCPUToGPU           = C.VMA_MEMORY_USAGE_CPU_TO_GPU
+	MemoryUsageGPUToCPU           = C.VMA_MEMORY_USAGE_GPU_TO_CPU
+	MemoryUsageCPUCopy            = C.VMA_MEMORY_USAGE_CPU_COPY
+	MemoryUsageGPULazilyAllocated = C.VMA_MEMORY_USAGE_GPU_LAZILY_ALLOCATED
+	MemoryUsageUsageMaxEnum       = C.VMA_MEMORY_USAGE_MAX_ENUM
 
 	// VmaAllocationCreateFlagBits
 
@@ -58,5 +64,6 @@ const (
 
 	// VmaDefragmentationFlagBits
 
+	DefragmentationFlagIncremental = C.VMA_DEFRAGMENTATION_FLAG_INCREMENTAL
 	DefragmentationFlagBitsMaxEnum = C.VMA_DEFRAGMENTATION_FLAG_BITS_MAX_ENUM
 )

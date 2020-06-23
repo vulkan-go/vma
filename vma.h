@@ -1,10 +1,10 @@
 #ifndef _VMA_GO_H
 #define _VMA_GO_H
 
-#define VK_NO_PROTOTYPES
+//#define VK_NO_PROTOTYPES
 #include "vulkan/vulkan.h"
 
-#define VMA_STATIC_VULKAN_FUNCTIONS 0
+//#define VMA_DYNAMIC_VULKAN_FUNCTIONS 0
 #include "vk_mem_alloc.h"
 
 typedef void* (*getInstanceProcAddr)(VkInstance, const char*);
@@ -31,6 +31,9 @@ void initVulkanFunctions(void* getProcAddrPtr, VkInstance instance, VmaVulkanFun
 	funcs->vkCmdCopyBuffer = (PFN_vkCmdCopyBuffer)((*getProcAddr)(instance, "vkCmdCopyBuffer"));
 	funcs->vkGetBufferMemoryRequirements2KHR = (PFN_vkGetBufferMemoryRequirements2KHR)((*getProcAddr)(instance, "vkGetBufferMemoryRequirements2KHR"));
 	funcs->vkGetImageMemoryRequirements2KHR = (PFN_vkGetImageMemoryRequirements2KHR)((*getProcAddr)(instance, "vkGetImageMemoryRequirements2KHR"));
+	funcs->vkBindBufferMemory2KHR = (PFN_vkBindBufferMemory2KHR)((*getProcAddr)(instance, "vkBindBufferMemory2KHR"));
+	funcs->vkBindImageMemory2KHR = (PFN_vkBindImageMemory2KHR)((*getProcAddr)(instance, "vkBindImageMemory2KHR"));
+	funcs->vkGetPhysicalDeviceMemoryProperties2KHR = (PFN_vkGetPhysicalDeviceMemoryProperties2KHR)((*getProcAddr)(instance, "vkGetPhysicalDeviceMemoryProperties2KHR"));
 }
 
 #endif // include guard

@@ -2,4 +2,4 @@ module github.com/vulkan-go/vma
 
 go 1.12
 
-require github.com/vulkan-go/vulkan v0.0.0-20181015060211-df48e8cc1538
+require github.com/vulkan-go/vulkan v0.0.0-20200123094538-aa511c71e200

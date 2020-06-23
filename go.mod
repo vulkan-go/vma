@@ -1,4 +1,4 @@
-module github.com/vulkan-go/vma
+module github.com/vulkan-go/vma/v2
 
 go 1.12
 

@@ -181,10 +181,10 @@ func initVkFuncs(procAddr unsafe.Pointer, instance vk.Instance) {
 		return
 	}
 	fetchVkFuncsMu.Lock()
+	defer fetchVkFuncsMu.Unlock()
 	if atomic.LoadInt32(&fetchedVkFuncs) == 1 {
 		return
 	}
-	defer fetchVkFuncsMu.Unlock()
 	C.initVulkanFunctions(procAddr,
 		C.VkInstance(unsafe.Pointer(instance)), &C.vkFuncs)
 	atomic.StoreInt32(&fetchedVkFuncs, 1)
